@@ -1,5 +1,6 @@
 
 import re
+
 fileName1 = "SquareGame.jack"
 fileName2 = "Main.jack"
 file1 = open(fileName1)
@@ -31,16 +32,41 @@ def remove_comments(fileName):
         content = content.strip()
     return content
 
-def test(fileName):
+def tokenizer(fileName):
     content = remove_comments(fileName)
-   
-    for line in content.split():
-        print(line)
+    content = re.sub(r'([;,.\(\)\{\}\[\]=\+\-\*/|~<>])', r' \1 ', content) 
+    array = content.split()
+    
+    outputFiledata = ""
+
+    
+    for i in range(len(array)):     
+        if array[i] in keyword_map:
+            outputFiledata += "<keyword> " + array[i] + " </keyword>\n"
+        elif array[i] in symbol_map:
+           outputFiledata += "<symbol> " + array[i] + " </symbol>\n"
+        elif re.search(identifier_e, array[i]):
+            outputFiledata += "<identifier> " + array[i] + " </identifier>\n"
+        else:
+            outputFiledata += "N/A\n"
+    
+    return outputFiledata
+
+def createFile(outputData, outFile):
+    with open(outFile, "w") as out_file:
+        out_file.write(f"<tokens>\n{outputData}</tokens>\n")
+    
+
+                 
+        
+        
 
 
 def main():
-    test(fileName1)
-    test(fileName2)
+    data1 = tokenizer(fileName1)
+    data2= tokenizer(fileName2)
+    createFile(data1, "SquareGame.xml")
+    createFile(data2, "Main.xml")
     
 if __name__ == "__main__":
     main()
